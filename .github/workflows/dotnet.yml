@@ -2,9 +2,9 @@ name: 030-dotnet-workflow
 
 on:
   push:
-    branches: none # [ main ]
+    branches: main # [ main ]
   pull_request:
-    branches: none # [ main ]
+    branches: main # [ main ]
     
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -16,7 +16,7 @@ jobs:
     
     defaults:
       run:
-        working-directory: 03-app-dotnet
+        working-directory: minecraft_clone
 
     steps:
     - uses: actions/checkout@v3
@@ -24,7 +24,7 @@ jobs:
     - name: Setup .NET
       uses: actions/setup-dotnet@v2
       with:
-        dotnet-version: 6.0.x
+        dotnet-version: 8.0.x
   
     - name: Restore dependencies
       run: dotnet restore
