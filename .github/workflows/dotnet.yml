@@ -1,25 +1,36 @@
-name: Upload dotnet package
+name: 030-dotnet-workflow
 
 on:
-  release:
-    types: [created]
+  push:
+    branches: none # [ main ]
+  pull_request:
+    branches: none # [ main ]
+    
+  # Allows you to run this workflow manually from the Actions tab
+  workflow_dispatch:
 
 jobs:
-  deploy:
+  build-dotnet-app:
+
     runs-on: ubuntu-latest
-    permissions:
-      packages: write
-      contents: read
+    
+    defaults:
+      run:
+        working-directory: 03-app-dotnet
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-dotnet@v4
-        with:
-          dotnet-version: '8.0.x' # SDK Version to use.
-          source-url: https://nuget.pkg.github.com/<owner>/index.json
-        env:
-          NUGET_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
-      - run: dotnet build --configuration Release <minecraft_clone>
-      - name: Create the package
-        run: dotnet pack --configuration Release <minecraft_clone>
-      - name: Publish the package to GPR
-        run: dotnet nuget push <minecraft_clone>/bin/Release/*.nupkg
+    - uses: actions/checkout@v3
+    
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v2
+      with:
+        dotnet-version: 6.0.x
+  
+    - name: Restore dependencies
+      run: dotnet restore
+      
+    - name: Build
+      run: dotnet build --no-restore
+      
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
