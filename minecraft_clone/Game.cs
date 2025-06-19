@@ -15,15 +15,24 @@ namespace OpenTK_Minecraft_Clone
     {
         float[] vertices =
         {
-            0f, 0.5f, 0f, //top
-            -0.5f, -0.5f, 0f, //bottom left
-            0.5f, -0.5f, 0f //bottom right
+            -0.5f, 0.5f, 0f, // Top Left Vertex
+            0.5f, 0.5f, 0f, // Top Right Vertex
+            0.5f, -0.5f, 0f, // Bottom Right Vertex
+            -0.5f, -0.5f, 0f // Bottom Left Vertex
+        };
+
+        uint[] indices =
+        {
+            0, 1, 2,
+            2, 3, 0
         };
 
         //Render Pipelines
 
         int vao;
         int shaderProgram;
+        int vbo;
+        int ebo;
 
         //CONSTANTS
         int width, height;
@@ -48,7 +57,7 @@ namespace OpenTK_Minecraft_Clone
 
             vao = GL.GenVertexArray();
 
-            int vbo = GL.GenBuffer();
+            vbo = GL.GenBuffer();
 
             GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
             GL.BufferData(BufferTarget.ArrayBuffer, vertices.Length * sizeof(float), vertices, BufferUsageHint.StaticDraw);
@@ -61,6 +70,14 @@ namespace OpenTK_Minecraft_Clone
             // Unbind VBO and VAO 
             GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
             GL.BindVertexArray(0);
+
+            // Bind EBO
+            ebo = GL.GenBuffer();
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
+
+            // Unbind EBO
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
 
             // Create Shader Program
             shaderProgram = GL.CreateProgram();
@@ -91,7 +108,8 @@ namespace OpenTK_Minecraft_Clone
         {
             base.OnUnload();
             GL.DeleteVertexArray(vao);
-            // GL.DeleteBuffer(vbo);
+            GL.DeleteBuffer(vbo);
+            GL.DeleteBuffer(ebo);
             GL.DeleteProgram(shaderProgram);
         }
 
@@ -103,7 +121,9 @@ namespace OpenTK_Minecraft_Clone
             // Draw The Triangle
             GL.UseProgram(shaderProgram);
             GL.BindVertexArray(vao);
-            GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
+            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            // GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             Context.SwapBuffers();
 
