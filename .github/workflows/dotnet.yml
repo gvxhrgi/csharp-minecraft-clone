@@ -1,36 +1,104 @@
-name: 030-dotnet-workflow
+name: Build and Release .NET Application
 
 on:
   push:
-    branches: main # [ main ]
-  pull_request:
-    branches: main # [ main ]
-    
-  # Allows you to run this workflow manually from the Actions tab
-  workflow_dispatch:
+    tags:
+      - 'v*'  # Triggers on version tags like v1.0.0, v2.1.0, etc.
+  workflow_dispatch:  # Allows manual triggering
 
 jobs:
-  build-dotnet-app:
-
+  build-and-release:
     runs-on: ubuntu-latest
     
-    defaults:
-      run:
-        working-directory: minecraft_clone
-
     steps:
-    - uses: actions/checkout@v3
-    
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
     - name: Setup .NET
-      uses: actions/setup-dotnet@v2
+      uses: actions/setup-dotnet@v4
       with:
-        dotnet-version: 8.0.x
-  
+        dotnet-version: '8.0.x'  # Change to your .NET version (6.0.x, 7.0.x, etc.)
+        
     - name: Restore dependencies
       run: dotnet restore
       
-    - name: Build
-      run: dotnet build --no-restore
+    - name: Build application
+      run: dotnet build --configuration Release --no-restore
       
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
+    - name: Test application
+      run: dotnet test --configuration Release --no-build --verbosity normal
+      
+    - name: Publish Windows x64
+      run: dotnet publish --configuration Release --runtime win-x64 --self-contained true --output ./publish/win-x64
+      
+    - name: Publish Linux x64
+      run: dotnet publish --configuration Release --runtime linux-x64 --self-contained true --output ./publish/linux-x64
+      
+    - name: Publish macOS x64
+      run: dotnet publish --configuration Release --runtime osx-x64 --self-contained true --output ./publish/osx-x64
+      
+    - name: Create Windows ZIP
+      run: |
+        cd ./publish/win-x64
+        zip -r ../../minecraft_clone-windows-x64.zip .
+        
+    - name: Create Linux TAR
+      run: |
+        cd ./publish/linux-x64
+        tar -czf ../../minecraft_clone-linux-x64.tar.gz .
+        
+    - name: Create macOS TAR
+      run: |
+        cd ./publish/osx-x64
+        tar -czf ../../minecraft_clone-macos-x64.tar.gz .
+        
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref_name }}
+        release_name: Release ${{ github.ref_name }}
+        body: |
+          ## Changes in this Release
+          - Add your release notes here
+          - List new features, bug fixes, etc.
+          
+          ## Download
+          Choose the appropriate version for your operating system:
+          - Windows: minecraft_clone-windows-x64.zip
+          - Linux: minecraft_clone-linux-x64.tar.gz
+          - macOS: minecraft_clone-macos-x64.tar.gz
+        draft: false
+        prerelease: false
+        
+    - name: Upload Windows Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./minecraft_clone-windows-x64.zip
+        asset_name: minecraft_clone-windows-x64.zip
+        asset_content_type: application/zip
+        
+    - name: Upload Linux Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./minecraft_clone-linux-x64.tar.gz
+        asset_name: minecraft_clone-linux-x64.tar.gz
+        asset_content_type: application/gzip
+        
+    - name: Upload macOS Release Asset
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./minecraft_clone-macos-x64.tar.gz
+        asset_name: minecraft_clone-macos-x64.tar.gz
+        asset_content_type: application/gzip
