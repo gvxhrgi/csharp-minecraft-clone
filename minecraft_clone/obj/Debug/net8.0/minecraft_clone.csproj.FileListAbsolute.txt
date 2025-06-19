@@ -60,3 +60,4 @@ C:\Users\Giorgi\Desktop\csharp-minecraft-clone\minecraft_clone\obj\Debug\net8.0\
 C:\Users\Giorgi\Desktop\csharp-minecraft-clone\minecraft_clone\obj\Debug\net8.0\minecraft_clone.pdb
 C:\Users\Giorgi\Desktop\csharp-minecraft-clone\minecraft_clone\obj\Debug\net8.0\minecraft_clone.genruntimeconfig.cache
 C:\Users\Giorgi\Desktop\csharp-minecraft-clone\minecraft_clone\obj\Debug\net8.0\ref\minecraft_clone.dll
+C:\Users\Giorgi\Desktop\csharp-minecraft-clone\minecraft_clone\bin\Debug\net8.0\StbImageSharp.dll
