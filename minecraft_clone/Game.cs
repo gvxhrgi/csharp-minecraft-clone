@@ -13,6 +13,7 @@ namespace OpenTK_Minecraft_Clone
 {
     internal class Game : GameWindow
     {
+        //CONSTANTS
         private static int SCREEN_WIDTH;
         private static int SCREEN_HEIGHT;
         public Game(int width, int height) : base(GameWindowSettings.Default, NativeWindowSettings.Default)
