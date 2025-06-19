@@ -65,17 +65,21 @@ namespace OpenTK_Minecraft_Clone
             // Create Shader Program
             shaderProgram = GL.CreateProgram();
 
+            // Create Vertex Shader
             int vertexShader = GL.CreateShader(ShaderType.VertexShader);
             GL.ShaderSource(vertexShader, LoadShaderSource("Default.vert"));
             GL.CompileShader(vertexShader);
 
+            // Create Fragment Shader
             int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
             GL.ShaderSource(fragmentShader, LoadShaderSource("Default.frag"));
             GL.CompileShader(fragmentShader);
 
+            // Attach Shaders To Program
             GL.AttachShader(shaderProgram, vertexShader);
             GL.AttachShader(shaderProgram, fragmentShader);
 
+            // Link Program To OpenGL
             GL.LinkProgram(shaderProgram);
 
             // Delete Shaders
@@ -87,6 +91,7 @@ namespace OpenTK_Minecraft_Clone
         {
             base.OnUnload();
             GL.DeleteVertexArray(vao);
+            // GL.DeleteBuffer(vbo);
             GL.DeleteProgram(shaderProgram);
         }
 
