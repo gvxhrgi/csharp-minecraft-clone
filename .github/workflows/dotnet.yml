@@ -6,6 +6,9 @@ on:
       - 'v*'  # Triggers on version tags like v1.0.0, v2.1.0, etc.
   workflow_dispatch:  # Allows manual triggering
 
+permissions:
+  contents: write  # Required for creating releases and uploading assets
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
@@ -52,14 +55,10 @@ jobs:
         cd ./publish/osx-x64
         tar -czf ../../minecraft_clone-macos-x64.tar.gz .
         
-    - name: Create Release
-      id: create_release
-      uses: actions/create-release@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    - name: Create Release and Upload Assets
+      uses: softprops/action-gh-release@v1
       with:
-        tag_name: ${{ github.ref_name }}
-        release_name: Release ${{ github.ref_name }}
+        name: Release ${{ github.ref_name }}
         body: |
           ## Changes in this Release
           - Add your release notes here
@@ -70,35 +69,9 @@ jobs:
           - Windows: minecraft_clone-windows-x64.zip
           - Linux: minecraft_clone-linux-x64.tar.gz
           - macOS: minecraft_clone-macos-x64.tar.gz
+        files: |
+          minecraft_clone-windows-x64.zip
+          minecraft_clone-linux-x64.tar.gz
+          minecraft_clone-macos-x64.tar.gz
         draft: false
         prerelease: false
-        
-    - name: Upload Windows Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./minecraft_clone-windows-x64.zip
-        asset_name: minecraft_clone-windows-x64.zip
-        asset_content_type: application/zip
-        
-    - name: Upload Linux Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./minecraft_clone-linux-x64.tar.gz
-        asset_name: minecraft_clone-linux-x64.tar.gz
-        asset_content_type: application/gzip
-        
-    - name: Upload macOS Release Asset
-      uses: actions/upload-release-asset@v1
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      with:
-        upload_url: ${{ steps.create_release.outputs.upload_url }}
-        asset_path: ./minecraft_clone-macos-x64.tar.gz
-        asset_name: minecraft_clone-macos-x64.tar.gz
-        asset_content_type: application/gzip
