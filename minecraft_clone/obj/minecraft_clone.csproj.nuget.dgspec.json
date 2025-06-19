@@ -1,20 +1,20 @@
 {
   "format": 1,
   "restore": {
-    "/workspaces/csharp-minecraft-clone/minecraft_clone/minecraft_clone.csproj": {}
+    "C:\\Users\\Giorgi\\Desktop\\csharp-minecraft-clone\\minecraft_clone\\minecraft_clone.csproj": {}
   },
   "projects": {
-    "/workspaces/csharp-minecraft-clone/minecraft_clone/minecraft_clone.csproj": {
+    "C:\\Users\\Giorgi\\Desktop\\csharp-minecraft-clone\\minecraft_clone\\minecraft_clone.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/workspaces/csharp-minecraft-clone/minecraft_clone/minecraft_clone.csproj",
+        "projectUniqueName": "C:\\Users\\Giorgi\\Desktop\\csharp-minecraft-clone\\minecraft_clone\\minecraft_clone.csproj",
         "projectName": "minecraft_clone",
-        "projectPath": "/workspaces/csharp-minecraft-clone/minecraft_clone/minecraft_clone.csproj",
-        "packagesPath": "/home/codespace/.nuget/packages/",
-        "outputPath": "/workspaces/csharp-minecraft-clone/minecraft_clone/obj/",
+        "projectPath": "C:\\Users\\Giorgi\\Desktop\\csharp-minecraft-clone\\minecraft_clone\\minecraft_clone.csproj",
+        "packagesPath": "C:\\Users\\Giorgi\\.nuget\\packages\\",
+        "outputPath": "C:\\Users\\Giorgi\\Desktop\\csharp-minecraft-clone\\minecraft_clone\\obj\\",
         "projectStyle": "PackageReference",
         "configFilePaths": [
-          "/home/codespace/.nuget/NuGet/NuGet.Config"
+          "C:\\Users\\Giorgi\\AppData\\Roaming\\NuGet\\NuGet.Config"
         ],
         "originalTargetFrameworks": [
           "net8.0"
@@ -64,7 +64,7 @@
               "privateAssets": "all"
             }
           },
-          "runtimeIdentifierGraphPath": "/usr/share/dotnet/sdk/8.0.410/PortableRuntimeIdentifierGraph.json"
+          "runtimeIdentifierGraphPath": "C:\\Program Files\\dotnet\\sdk\\8.0.411/PortableRuntimeIdentifierGraph.json"
         }
       }
     }
