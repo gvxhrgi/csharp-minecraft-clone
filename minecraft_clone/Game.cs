@@ -117,6 +117,9 @@ namespace OpenTK_Minecraft_Clone
         int ebo;
         int textureID;
 
+        // Camera
+        Camera camera;
+
         // Transformation Variables
         float yRot = 0f; // Y Rotation
 
@@ -226,13 +229,16 @@ namespace OpenTK_Minecraft_Clone
             StbImage.stbi_set_flip_vertically_on_load(1);
             string texturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Textures", "dirt.jpg");
             ImageResult dirtTexture = ImageResult.FromStream(File.OpenRead(texturePath), ColorComponents.RedGreenBlueAlpha);
-            
+
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, dirtTexture.Width, dirtTexture.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, dirtTexture.Data);
 
             // Unbind The Texture
             GL.BindTexture(TextureTarget.Texture2D, 0);
 
             GL.Enable(EnableCap.DepthTest); // Enable Depth Testing
+
+            camera = new Camera(width, height, Vector3.Zero);
+            CursorState = CursorState.Grabbed;
         }
 
         protected override void OnUnload()
@@ -259,8 +265,8 @@ namespace OpenTK_Minecraft_Clone
 
             // Transformation Matrices
             Matrix4 model = Matrix4.CreateRotationY(yRot);
-            Matrix4 view = Matrix4.Identity;
-            Matrix4 projection = Matrix4.CreatePerspectiveFieldOfView(MathHelper.DegreesToRadians(fov), width / height, 0.1f, RENDER_DISTANCE);
+            Matrix4 view = camera.GetViewMatrix();
+            Matrix4 projection = camera.GetProjectionMatrix();
 
             yRot += 0.001f; // Increment Y Rotation
             model *= Matrix4.CreateTranslation(0f, 0f, -3f);
@@ -284,7 +290,10 @@ namespace OpenTK_Minecraft_Clone
 
         protected override void OnUpdateFrame(FrameEventArgs args)
         {
+            MouseState mouse = MouseState;
+            KeyboardState input = KeyboardState;
             base.OnUpdateFrame(args);
+            camera.Update(input, mouse, args);
         }
 
         // Load Shader Source File
