@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using OpenTK.Graphics.OpenGL4;
@@ -289,17 +290,21 @@ namespace OpenTK_Minecraft_Clone
         public static string LoadShaderSource(string filePath)
         {
             string shaderSource = "";
+            // Get the base directory where the executable is running from
+            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+            // Combine with the shaders path
+            string fullPath = Path.Combine(baseDirectory, "Shaders", filePath);
 
             try
             {
-                using (StreamReader reader = new StreamReader("../../../Shaders/" + filePath))
+                using (StreamReader reader = new StreamReader(fullPath))
                 {
                     shaderSource = reader.ReadToEnd();
                 }
             }
             catch (Exception ex)
             {
-                Console.WriteLine("Failed To Load Shader Source File: " + ex.Message);
+                Console.WriteLine($"Failed to load shader at {fullPath}: {ex.Message}");
             }
 
             return shaderSource;
