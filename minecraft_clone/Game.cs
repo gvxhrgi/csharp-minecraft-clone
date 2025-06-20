@@ -224,8 +224,9 @@ namespace OpenTK_Minecraft_Clone
 
             // Load Image
             StbImage.stbi_set_flip_vertically_on_load(1);
-            ImageResult dirtTexture = ImageResult.FromStream(File.OpenRead("../../../Textures/dirt.jpg"), ColorComponents.RedGreenBlueAlpha);
-
+            string texturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Textures", "dirt.jpg");
+            ImageResult dirtTexture = ImageResult.FromStream(File.OpenRead(texturePath), ColorComponents.RedGreenBlueAlpha);
+            
             GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, dirtTexture.Width, dirtTexture.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, dirtTexture.Data);
 
             // Unbind The Texture
