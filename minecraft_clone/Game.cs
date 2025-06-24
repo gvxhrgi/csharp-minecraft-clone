@@ -182,7 +182,6 @@ namespace OpenTK_Minecraft_Clone
             ibo.Bind();
             texture.Bind();
 
-
             // Transformation Matrices
             Matrix4 model = Matrix4.CreateRotationY(yRot);
             Matrix4 view = camera.GetViewMatrix();
