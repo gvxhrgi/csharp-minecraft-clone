@@ -197,8 +197,6 @@ namespace OpenTK_Minecraft_Clone
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
 
-            // GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
-
             Context.SwapBuffers();
 
             base.OnRenderFrame(args);
