@@ -9,6 +9,7 @@ using OpenTK.Mathematics;
 using OpenTK.Windowing.Common;
 using OpenTK.Windowing.Desktop;
 using OpenTK.Windowing.GraphicsLibraryFramework;
+using OpenTK_Minecraft_Clone.Graphics;
 using StbImageSharp;
 
 namespace OpenTK_Minecraft_Clone
@@ -85,7 +86,7 @@ namespace OpenTK_Minecraft_Clone
             new Vector2(0f, 0f),
         };
 
-        uint[] indices =
+        List<uint> indices = new List<uint>
         {
             // first face
             // top triangle
@@ -109,13 +110,12 @@ namespace OpenTK_Minecraft_Clone
             22, 23, 20
         };
 
-        //Render Pipelines
-        int vao;
-        int shaderProgram;
-        int vbo;
-        int textureVBO;
-        int ebo;
-        int textureID;
+        // Render Pipeline Variables
+        VBO vbo;
+        VAO vao;
+        IBO ibo;
+        ShaderProgram program;
+        Texture texture;
 
         // Camera
         Camera camera;
@@ -144,96 +144,17 @@ namespace OpenTK_Minecraft_Clone
         {
             base.OnLoad();
 
-            // Generate VAO
-            vao = GL.GenVertexArray();
+            vao = new VAO();
+            vbo = new VBO(vertices);
+            vao.LinkToVAO(0, 3, vbo);
+            VBO uvVBO = new VBO(texCoords);
+            vao.LinkToVAO(1, 2, uvVBO);
 
-            // Bind VAO
-            GL.BindVertexArray(vao);
+            ibo = new IBO(indices);
 
-            // ---- Vertices VBO ----
+            program = new ShaderProgram("Default.vert", "Default.frag");
 
-            vbo = GL.GenBuffer();
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, vbo);
-            GL.BufferData(BufferTarget.ArrayBuffer, vertices.Count * Vector3.SizeInBytes, vertices.ToArray(), BufferUsageHint.StaticDraw);
-
-            // Put Vertex VBO In Slot 0 Of Our VAO
-            // Point Slot (0) Of The VAO To The Currently Bound VBO (vbo)
-            GL.VertexAttribPointer(0, 3, VertexAttribPointerType.Float, false, 0, 0);
-            // Enable The Slot
-            GL.EnableVertexArrayAttrib(vao, 0);
-
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-
-            // ---- Texture VBO ----
-            textureVBO = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ArrayBuffer, textureVBO);
-            GL.BufferData(BufferTarget.ArrayBuffer, texCoords.Count * Vector2.SizeInBytes, texCoords.ToArray(), BufferUsageHint.StaticDraw);
-
-            // Put Texture VBO In Slot 1 Of Our VAO
-            // Point Slot (1) Of The VAO To The Currently Bound VBO (vbo)
-            GL.VertexAttribPointer(1, 2, VertexAttribPointerType.Float, false, 0, 0);
-            // Enable The Slot
-            GL.EnableVertexArrayAttrib(vao, 1);
-
-            // Unbind VBO and VAO 
-            GL.BindBuffer(BufferTarget.ArrayBuffer, 0);
-            GL.BindVertexArray(0);
-
-            // Bind EBO
-            ebo = GL.GenBuffer();
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
-            GL.BufferData(BufferTarget.ElementArrayBuffer, indices.Length * sizeof(uint), indices, BufferUsageHint.StaticDraw);
-
-            // Unbind EBO
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, 0);
-
-            // Create Shader Program
-            shaderProgram = GL.CreateProgram();
-
-            // Create Vertex Shader
-            int vertexShader = GL.CreateShader(ShaderType.VertexShader);
-            GL.ShaderSource(vertexShader, LoadShaderSource("Default.vert"));
-            GL.CompileShader(vertexShader);
-
-            // Create Fragment Shader
-            int fragmentShader = GL.CreateShader(ShaderType.FragmentShader);
-            GL.ShaderSource(fragmentShader, LoadShaderSource("Default.frag"));
-            GL.CompileShader(fragmentShader);
-
-            // Attach Shaders To Program
-            GL.AttachShader(shaderProgram, vertexShader);
-            GL.AttachShader(shaderProgram, fragmentShader);
-
-            // Link Program To OpenGL
-            GL.LinkProgram(shaderProgram);
-
-            // Delete Shaders
-            GL.DeleteShader(vertexShader);
-            GL.DeleteShader(fragmentShader);
-
-            // ----- Textures -----
-            textureID = GL.GenTexture();
-
-            // Activate Texture In Unit
-            GL.ActiveTexture(TextureUnit.Texture0);
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
-
-            // Texture Parameters
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapS, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureWrapT, (int)TextureWrapMode.Repeat);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMinFilter, (int)TextureMinFilter.Nearest);
-            GL.TexParameter(TextureTarget.Texture2D, TextureParameterName.TextureMagFilter, (int)TextureMagFilter.Nearest);
-
-            // Load Image
-            StbImage.stbi_set_flip_vertically_on_load(1);
-            string texturePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Textures", "dirt.jpg");
-            ImageResult dirtTexture = ImageResult.FromStream(File.OpenRead(texturePath), ColorComponents.RedGreenBlueAlpha);
-
-            GL.TexImage2D(TextureTarget.Texture2D, 0, PixelInternalFormat.Rgba, dirtTexture.Width, dirtTexture.Height, 0, PixelFormat.Rgba, PixelType.UnsignedByte, dirtTexture.Data);
-
-            // Unbind The Texture
-            GL.BindTexture(TextureTarget.Texture2D, 0);
+            texture = new Texture("dirt.jpg");
 
             GL.Enable(EnableCap.DepthTest); // Enable Depth Testing
 
@@ -244,11 +165,11 @@ namespace OpenTK_Minecraft_Clone
         protected override void OnUnload()
         {
             base.OnUnload();
-            GL.DeleteVertexArray(vao);
-            GL.DeleteBuffer(vbo);
-            GL.DeleteBuffer(ebo);
-            GL.DeleteTexture(textureID);
-            GL.DeleteProgram(shaderProgram);
+            vbo.Delete();
+            vao.Delete();
+            ibo.Delete();
+            program.Delete();
+            texture.Delete();
         }
 
         protected override void OnRenderFrame(FrameEventArgs args)
@@ -256,12 +177,11 @@ namespace OpenTK_Minecraft_Clone
             GL.ClearColor(0.6f, 0.3f, 1f, 1f);
             GL.Clear(ClearBufferMask.ColorBufferBit | ClearBufferMask.DepthBufferBit);
 
-            // Draw The Triangle
-            GL.UseProgram(shaderProgram);
-            GL.BindVertexArray(vao);
-            GL.BindBuffer(BufferTarget.ElementArrayBuffer, ebo);
+            program.Bind();
+            vao.Bind();
+            ibo.Bind();
+            texture.Bind();
 
-            GL.BindTexture(TextureTarget.Texture2D, textureID);
 
             // Transformation Matrices
             Matrix4 model = Matrix4.CreateRotationY(yRot);
@@ -271,16 +191,20 @@ namespace OpenTK_Minecraft_Clone
             yRot += 0.001f; // Increment Y Rotation
             model *= Matrix4.CreateTranslation(0f, 0f, -3f);
 
-            int modelLocation = GL.GetUniformLocation(shaderProgram, "model");
-            int viewLocation = GL.GetUniformLocation(shaderProgram, "view");
-            int projectionLocation = GL.GetUniformLocation(shaderProgram, "projection");
+            int modelLocation = GL.GetUniformLocation(program.ID, "model");
+            int viewLocation = GL.GetUniformLocation(program.ID, "view");
+            int projectionLocation = GL.GetUniformLocation(program.ID, "projection");
 
             GL.UniformMatrix4(modelLocation, true, ref model);
             GL.UniformMatrix4(viewLocation, true, ref view);
             GL.UniformMatrix4(projectionLocation, true, ref projection);
 
+            GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
 
-            GL.DrawElements(PrimitiveType.Triangles, indices.Length, DrawElementsType.UnsignedInt, 0);
+            model += Matrix4.CreateTranslation(new Vector3(2f, 0f, 0f));
+            GL.UniformMatrix4(modelLocation, true, ref model);
+            GL.DrawElements(PrimitiveType.Triangles, indices.Count, DrawElementsType.UnsignedInt, 0);
+
             // GL.DrawArrays(PrimitiveType.Triangles, 0, 3);
 
             Context.SwapBuffers();
@@ -294,30 +218,6 @@ namespace OpenTK_Minecraft_Clone
             KeyboardState input = KeyboardState;
             base.OnUpdateFrame(args);
             camera.Update(input, mouse, args);
-        }
-
-        // Load Shader Source File
-        public static string LoadShaderSource(string filePath)
-        {
-            string shaderSource = "";
-            // Get the base directory where the executable is running from
-            string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
-            // Combine with the shaders path
-            string fullPath = Path.Combine(baseDirectory, "Shaders", filePath);
-
-            try
-            {
-                using (StreamReader reader = new StreamReader(fullPath))
-                {
-                    shaderSource = reader.ReadToEnd();
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Failed to load shader at {fullPath}: {ex.Message}");
-            }
-
-            return shaderSource;
         }
     }
 }
