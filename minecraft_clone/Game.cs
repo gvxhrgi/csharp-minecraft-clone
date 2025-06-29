@@ -45,6 +45,10 @@ namespace OpenTK_Minecraft_Clone
 
             GL.Enable(EnableCap.DepthTest); // Enable Depth Testing
 
+            GL.FrontFace(FrontFaceDirection.Cw);
+            GL.Enable(EnableCap.CullFace);
+            GL.CullFace(CullFaceMode.Back);
+
             camera = new Camera(width, height, Vector3.Zero);
             CursorState = CursorState.Grabbed;
         }

@@ -5,6 +5,7 @@ namespace OpenTK_Minecraft_Clone.World
     internal class Block
     {
         public Vector3 position;
+        public BlockType type;
 
         private Dictionary<Faces, FaceData> faces;
 
@@ -16,8 +17,9 @@ namespace OpenTK_Minecraft_Clone.World
             new Vector2(0f, 0f),
         };
 
-        public Block(Vector3 position)
+        public Block(Vector3 position, BlockType blockType = BlockType.EMPTY)
         {
+            type = blockType;
             this.position = position;
             faces = new Dictionary<Faces, FaceData>
             {

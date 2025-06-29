@@ -2,6 +2,11 @@ using OpenTK.Mathematics;
 
 namespace OpenTK_Minecraft_Clone.World
 {
+    public enum BlockType
+    {
+        DIRT,
+        EMPTY
+    }
     public enum Faces
     {
         FRONT,
