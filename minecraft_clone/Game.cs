@@ -47,7 +47,7 @@ namespace OpenTK_Minecraft_Clone
 
             GL.FrontFace(FrontFaceDirection.Cw);
             GL.Enable(EnableCap.CullFace);
-            GL.CullFace(CullFaceMode.Back);
+            GL.CullFace(TriangleFace.Back);
 
             camera = new Camera(width, height, Vector3.Zero);
             CursorState = CursorState.Grabbed;
